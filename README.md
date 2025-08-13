@@ -265,14 +265,6 @@ atio.write(df, "data.parquet", format="parquet", verbose=True)
 - `sqlalchemy`: SQL 데이터베이스 지원
 - `polars`: Polars DataFrame 지원
 
-## 🤝 기여하기
-
-1. 이 저장소를 포크합니다
-2. 기능 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
-3. 변경사항을 커밋합니다 (`git commit -m 'Add amazing feature'`)
-4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
-5. Pull Request를 생성합니다
-
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
@@ -280,12 +272,6 @@ atio.write(df, "data.parquet", format="parquet", verbose=True)
 ## 🐛 버그 리포트
 
 버그를 발견하셨나요? [Issues](https://github.com/seojaeohcode/atio/issues) 페이지에서 리포트해 주세요.
-
-## 📞 지원
-
-질문이나 제안사항이 있으시면 언제든지 연락해 주세요:
-
-- GitHub Issues: [https://github.com/seojaeohcode/atio/issues](https://github.com/seojaeohcode/atio/issues)
 
 ---
 
