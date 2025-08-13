@@ -6,7 +6,7 @@
 <b>🚀 `pip install atio`</b>
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![PyPI](https://img.shields.io/badge/PyPI-2.0.0-orange.svg)](https://pypi.org/project/atio/)
 
 </div>
@@ -298,7 +298,7 @@ atio.write(df, "data.parquet", format="parquet", verbose=True)
 
 ## 📄 라이선스
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
+이 프로젝트는 Apache 2.0 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 ## 🐛 버그 리포트
 
@@ -310,4 +310,4 @@ atio.write(df, "data.parquet", format="parquet", verbose=True)
 
 **Atio** - 안전하고 빠른 데이터 쓰기 라이브러리 🚀
 
-</div> 
+</div>  
