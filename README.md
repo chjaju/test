@@ -9,7 +9,6 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PyPI](https://img.shields.io/badge/PyPI-2.0.0-orange.svg)](https://pypi.org/project/atio/)
 
-
 </div>
 
 ---
@@ -73,47 +72,14 @@ engine = create_engine('postgresql://user:password@localhost/dbname')
 atio.write(df, format="sql", name="products", con=engine)
 ```
 
-### 버전 관리가 있는 스냅샷 쓰기
+### 버전 관리
 
 ```python
 # 테이블 형태로 버전 관리하며 저장
 atio.write_snapshot(df, "my_table", mode="overwrite", format="parquet")
 
-# 기존 데이터에 추가 (append 모드)
-new_data = pd.DataFrame({"name": ["David"], "age": [40], "city": ["Daejeon"]})
-atio.write_snapshot(new_data, "my_table", mode="append", format="parquet")
-```
-
-### 테이블 데이터 읽기
-
-```python
-# 최신 버전 읽기
+# 최신 데이터 읽기
 latest_data = atio.read_table("my_table", output_as="pandas")
-
-# 특정 버전 읽기
-version_1_data = atio.read_table("my_table", version=1, output_as="pandas")
-
-# Polars 형식으로 읽기
-polars_data = atio.read_table("my_table", output_as="polars")
-```
-
-### 오래된 데이터 정리
-
-```python
-from datetime import timedelta
-
-# 7일 이상 된 데이터 정리 (dry-run 모드)
-atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=True)
-
-# 실제 삭제 실행
-atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=False)
-```
-
-### 진행률 표시
-
-```python
-# 대용량 데이터 처리 시 진행률 표시
-atio.write(large_df, "big_data.parquet", format="parquet", show_progress=True)
 ```
 
 ## 🔧 API 참조
