@@ -7,7 +7,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![PyPI](https://img.shields.io/badge/PyPI-1.0.0-orange.svg)](https://pypi.org/project/atio/)
+[![PyPI](https://img.shields.io/badge/PyPI-2.0.0-orange.svg)](https://pypi.org/project/atio/)
 [![Downloads](https://img.shields.io/pypi/dm/atio)](https://pypi.org/project/atio/)
 
 </div>
