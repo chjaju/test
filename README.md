@@ -36,7 +36,18 @@ pip install atio
 
 ## 📚 사용법
 
-### 1. 기본 파일 쓰기
+### `atio.write()` - 기본 파일/데이터베이스 쓰기
+
+**용도**: 단일 파일 또는 데이터베이스에 데이터 저장
+
+**주요 매개변수**:
+- `obj`: 저장할 데이터 (pandas.DataFrame, polars.DataFrame, numpy.ndarray)
+- `target_path`: 파일 저장 경로 (파일 쓰기 시 필수)
+- `format`: 저장 형식 ('csv', 'parquet', 'excel', 'json', 'sql', 'database')
+- `show_progress`: 진행률 표시 여부
+- `verbose`: 상세한 성능 정보 출력 여부
+
+#### 기본 파일 쓰기
 
 ```python
 import atio
@@ -48,13 +59,13 @@ df = pd.DataFrame({
     "city": ["Seoul", "Busan", "Incheon"]
 })
 
-# 단일 파일로 저장
+# 다양한 형식으로 저장
 atio.write(df, "users.parquet", format="parquet")
 atio.write(df, "users.csv", format="csv", index=False)
 atio.write(df, "users.xlsx", format="excel", sheet_name="Users")
 ```
 
-### 2. 데이터베이스 쓰기
+#### 데이터베이스 쓰기
 
 ```python
 import atio
@@ -72,36 +83,7 @@ engine = create_engine('postgresql://user:password@localhost/dbname')
 atio.write(df, format="sql", name="products", con=engine, if_exists="replace")
 ```
 
-### 3. 버전 관리 (스냅샷)
-
-```python
-# 테이블 형태로 버전 관리하며 저장
-atio.write_snapshot(df, "my_table", mode="overwrite", format="parquet")
-
-# 기존 데이터에 추가
-new_data = pd.DataFrame({"name": ["David"], "age": [40], "city": ["Daejeon"]})
-atio.write_snapshot(new_data, "my_table", mode="append", format="parquet")
-
-# 최신 데이터 읽기
-latest_data = atio.read_table("my_table", output_as="pandas")
-
-# 특정 버전 읽기
-version_1_data = atio.read_table("my_table", version=1, output_as="pandas")
-```
-
-### 4. 데이터 정리
-
-```python
-from datetime import timedelta
-
-# 오래된 데이터 정리 (미리보기)
-atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=True)
-
-# 실제 삭제 실행
-atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=False)
-```
-
-### 5. 고급 기능
+#### 고급 기능 (진행률, 성능 모니터링)
 
 ```python
 # 진행률 표시와 함께 저장
@@ -116,20 +98,7 @@ polars_df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 atio.write(polars_df, "data.parquet", format="parquet")
 ```
 
-## 🔧 함수별 상세 설명
-
-### `atio.write(obj, target_path=None, format=None, show_progress=False, verbose=False, **kwargs)`
-
-**용도**: 단일 파일 또는 데이터베이스에 데이터 저장
-
-**주요 매개변수**:
-- `obj`: 저장할 데이터 (pandas.DataFrame, polars.DataFrame, numpy.ndarray)
-- `target_path`: 파일 저장 경로 (파일 쓰기 시 필수)
-- `format`: 저장 형식 ('csv', 'parquet', 'excel', 'json', 'sql', 'database')
-- `show_progress`: 진행률 표시 여부
-- `verbose`: 상세한 성능 정보 출력 여부
-
-### `atio.write_snapshot(obj, table_path, mode='overwrite', format='parquet', **kwargs)`
+### `atio.write_snapshot()` - 버전 관리가 있는 테이블 저장
 
 **용도**: 버전 관리가 있는 테이블 형태 저장
 
@@ -139,7 +108,18 @@ atio.write(polars_df, "data.parquet", format="parquet")
 - `mode`: 저장 모드 ('overwrite', 'append')
 - `format`: 저장 형식
 
-### `atio.read_table(table_path, version=None, output_as='pandas')`
+#### 버전 관리 사용법
+
+```python
+# 테이블 형태로 버전 관리하며 저장
+atio.write_snapshot(df, "my_table", mode="overwrite", format="parquet")
+
+# 기존 데이터에 추가 (append 모드)
+new_data = pd.DataFrame({"name": ["David"], "age": [40], "city": ["Daejeon"]})
+atio.write_snapshot(new_data, "my_table", mode="append", format="parquet")
+```
+
+### `atio.read_table()` - 테이블 데이터 읽기
 
 **용도**: 테이블에서 데이터 읽기
 
@@ -148,7 +128,20 @@ atio.write(polars_df, "data.parquet", format="parquet")
 - `version`: 읽을 버전 번호 (None이면 최신)
 - `output_as`: 출력 형식 ('pandas', 'polars')
 
-### `atio.expire_snapshots(table_path, keep_for=timedelta(days=7), dry_run=True)`
+#### 테이블 읽기 사용법
+
+```python
+# 최신 데이터 읽기
+latest_data = atio.read_table("my_table", output_as="pandas")
+
+# 특정 버전 읽기
+version_1_data = atio.read_table("my_table", version=1, output_as="pandas")
+
+# Polars 형식으로 읽기
+polars_data = atio.read_table("my_table", output_as="polars")
+```
+
+### `atio.expire_snapshots()` - 오래된 데이터 정리
 
 **용도**: 오래된 스냅샷과 고아 파일 정리
 
@@ -156,6 +149,18 @@ atio.write(polars_df, "data.parquet", format="parquet")
 - `table_path`: 테이블 경로
 - `keep_for`: 보관 기간
 - `dry_run`: 실제 삭제 여부 (True면 미리보기만)
+
+#### 데이터 정리 사용법
+
+```python
+from datetime import timedelta
+
+# 오래된 데이터 정리 (미리보기)
+atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=True)
+
+# 실제 삭제 실행
+atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=False)
+```
 
 ## 📊 지원 형식
 
