@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/Atio-Atomic%20Write%20Library-blue?style=for-the-badge&logo=python" width="400" />
+<img src="https://img.shields.io/badge/Atio-blue?style=for-the-badge&logo=python" width="400" />
 
 <b>안전한 원자적 파일 쓰기와 데이터베이스 쓰기를 위한 파이썬 라이브러리</b><br>
 <b>🚀 `pip install atio`</b>
