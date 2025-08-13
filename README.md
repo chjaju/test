@@ -282,12 +282,6 @@ This project is distributed under the Apache 2.0 License. See the [LICENSE](LICE
 
 Found a bug? Please report it on the [Issues](https://github.com/seojaeohcode/atio/issues) page.
 
-## 📞 Support
-
-For questions or suggestions, please contact us anytime:
-
-- GitHub Issues: [https://github.com/seojaeohcode/atio/issues](https://github.com/seojaeohcode/atio/issues)
-
 ---
 
 <div align="center">
