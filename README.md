@@ -34,27 +34,27 @@ Atio는 데이터 손실을 방지하고 안전한 파일 쓰기를 보장하는
 pip install atio
 ```
 
-## 📚 빠른 시작
+## 📚 사용법
 
-### 기본 파일 쓰기
+### 1. 기본 파일 쓰기
 
 ```python
 import atio
 import pandas as pd
 
-# DataFrame 생성
 df = pd.DataFrame({
     "name": ["Alice", "Bob", "Charlie"],
     "age": [25, 30, 35],
     "city": ["Seoul", "Busan", "Incheon"]
 })
 
-# 안전한 파일 저장
+# 단일 파일로 저장
 atio.write(df, "users.parquet", format="parquet")
 atio.write(df, "users.csv", format="csv", index=False)
+atio.write(df, "users.xlsx", format="excel", sheet_name="Users")
 ```
 
-### 데이터베이스 쓰기
+### 2. 데이터베이스 쓰기
 
 ```python
 import atio
@@ -69,78 +69,104 @@ df = pd.DataFrame({
 
 # SQL 데이터베이스에 저장
 engine = create_engine('postgresql://user:password@localhost/dbname')
-atio.write(df, format="sql", name="products", con=engine)
+atio.write(df, format="sql", name="products", con=engine, if_exists="replace")
 ```
 
-### 버전 관리
+### 3. 버전 관리 (스냅샷)
 
 ```python
 # 테이블 형태로 버전 관리하며 저장
 atio.write_snapshot(df, "my_table", mode="overwrite", format="parquet")
 
+# 기존 데이터에 추가
+new_data = pd.DataFrame({"name": ["David"], "age": [40], "city": ["Daejeon"]})
+atio.write_snapshot(new_data, "my_table", mode="append", format="parquet")
+
 # 최신 데이터 읽기
 latest_data = atio.read_table("my_table", output_as="pandas")
+
+# 특정 버전 읽기
+version_1_data = atio.read_table("my_table", version=1, output_as="pandas")
 ```
 
-## 🔧 API 참조
-
-### `atio.write()`
-
-데이터 객체를 안전하게 파일 또는 데이터베이스에 저장합니다.
+### 4. 데이터 정리
 
 ```python
-atio.write(obj, target_path=None, format=None, show_progress=False, verbose=False, **kwargs)
+from datetime import timedelta
+
+# 오래된 데이터 정리 (미리보기)
+atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=True)
+
+# 실제 삭제 실행
+atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=False)
 ```
 
-### `atio.write_snapshot()`
-
-버전 관리가 있는 테이블 형태로 데이터를 저장합니다.
+### 5. 고급 기능
 
 ```python
-atio.write_snapshot(obj, table_path, mode='overwrite', format='parquet', **kwargs)
+# 진행률 표시와 함께 저장
+atio.write(large_df, "big_data.parquet", format="parquet", show_progress=True)
+
+# 상세한 성능 정보 출력
+atio.write(df, "data.parquet", format="parquet", verbose=True)
+
+# Polars DataFrame 사용
+import polars as pl
+polars_df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+atio.write(polars_df, "data.parquet", format="parquet")
 ```
 
-### `atio.read_table()`
+## 🔧 함수별 상세 설명
 
-테이블에서 데이터를 읽어옵니다.
+### `atio.write(obj, target_path=None, format=None, show_progress=False, verbose=False, **kwargs)`
 
-```python
-atio.read_table(table_path, version=None, output_as='pandas')
-```
+**용도**: 단일 파일 또는 데이터베이스에 데이터 저장
 
-### `atio.expire_snapshots()`
+**주요 매개변수**:
+- `obj`: 저장할 데이터 (pandas.DataFrame, polars.DataFrame, numpy.ndarray)
+- `target_path`: 파일 저장 경로 (파일 쓰기 시 필수)
+- `format`: 저장 형식 ('csv', 'parquet', 'excel', 'json', 'sql', 'database')
+- `show_progress`: 진행률 표시 여부
+- `verbose`: 상세한 성능 정보 출력 여부
 
-오래된 스냅샷과 고아 파일을 정리합니다.
+### `atio.write_snapshot(obj, table_path, mode='overwrite', format='parquet', **kwargs)`
 
-```python
-atio.expire_snapshots(table_path, keep_for=timedelta(days=7), dry_run=True)
-```
+**용도**: 버전 관리가 있는 테이블 형태 저장
 
-#### 매개변수
+**주요 매개변수**:
+- `obj`: 저장할 데이터
+- `table_path`: 테이블 저장 경로
+- `mode`: 저장 모드 ('overwrite', 'append')
+- `format`: 저장 형식
 
-- **obj**: 저장할 데이터 객체 (pandas.DataFrame, polars.DataFrame, numpy.ndarray 등)
-- **target_path** (str, optional): 파일 저장 경로 (파일 기반 쓰기 시 필수)
-- **table_path** (str): 테이블 저장 경로 (스냅샷 쓰기 시 필수)
-- **format** (str, optional): 저장 형식 ('csv', 'parquet', 'excel', 'json', 'sql', 'database' 등)
-- **mode** (str): 스냅샷 모드 ('overwrite', 'append')
-- **version** (int, optional): 읽을 버전 번호 (None이면 최신 버전)
-- **output_as** (str): 출력 형식 ('pandas', 'polars')
-- **keep_for** (timedelta): 보관 기간
-- **dry_run** (bool): 실제 삭제 여부 (True면 미리보기만)
-- **show_progress** (bool): 진행률 표시 여부 (기본값: False)
-- **verbose** (bool): 상세한 성능 진단 정보 출력 여부 (기본값: False)
-- **kwargs**: 각 쓰기 함수에 전달될 추가 키워드 인자
+### `atio.read_table(table_path, version=None, output_as='pandas')`
 
-#### 지원 형식
+**용도**: 테이블에서 데이터 읽기
 
-| 형식 | 설명 | 필수 인자 |
-|------|------|-----------|
-| `csv` | CSV 파일 | `target_path` |
-| `parquet` | Parquet 파일 | `target_path` |
-| `excel` | Excel 파일 | `target_path` |
-| `json` | JSON 파일 | `target_path` |
-| `sql` | SQL 데이터베이스 | `name` (테이블명), `con` (DB 커넥션) |
-| `database` | 데이터베이스 (Polars) | `table_name`, `connection_uri` |
+**주요 매개변수**:
+- `table_path`: 테이블 경로
+- `version`: 읽을 버전 번호 (None이면 최신)
+- `output_as`: 출력 형식 ('pandas', 'polars')
+
+### `atio.expire_snapshots(table_path, keep_for=timedelta(days=7), dry_run=True)`
+
+**용도**: 오래된 스냅샷과 고아 파일 정리
+
+**주요 매개변수**:
+- `table_path`: 테이블 경로
+- `keep_for`: 보관 기간
+- `dry_run`: 실제 삭제 여부 (True면 미리보기만)
+
+## 📊 지원 형식
+
+| 형식 | 설명 | 필수 인자 | 예시 |
+|------|------|-----------|------|
+| `csv` | CSV 파일 | `target_path` | `atio.write(df, "data.csv", format="csv")` |
+| `parquet` | Parquet 파일 | `target_path` | `atio.write(df, "data.parquet", format="parquet")` |
+| `excel` | Excel 파일 | `target_path` | `atio.write(df, "data.xlsx", format="excel")` |
+| `json` | JSON 파일 | `target_path` | `atio.write(df, "data.json", format="json")` |
+| `sql` | SQL 데이터베이스 | `name`, `con` | `atio.write(df, format="sql", name="table", con=engine)` |
+| `database` | 데이터베이스 (Polars) | `table_name`, `connection_uri` | `atio.write(df, format="database", table_name="table", connection_uri="...")` |
 
 ## 📋 사용 예제
 
@@ -265,6 +291,14 @@ atio.write(df, "data.parquet", format="parquet", verbose=True)
 - `sqlalchemy`: SQL 데이터베이스 지원
 - `polars`: Polars DataFrame 지원
 
+## 🤝 기여하기
+
+1. 이 저장소를 포크합니다
+2. 기능 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
+3. 변경사항을 커밋합니다 (`git commit -m 'Add amazing feature'`)
+4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
+5. Pull Request를 생성합니다
+
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
@@ -272,6 +306,12 @@ atio.write(df, "data.parquet", format="parquet", verbose=True)
 ## 🐛 버그 리포트
 
 버그를 발견하셨나요? [Issues](https://github.com/seojaeohcode/atio/issues) 페이지에서 리포트해 주세요.
+
+## 📞 지원
+
+질문이나 제안사항이 있으시면 언제든지 연락해 주세요:
+
+- GitHub Issues: [https://github.com/seojaeohcode/atio/issues](https://github.com/seojaeohcode/atio/issues)
 
 ---
 
