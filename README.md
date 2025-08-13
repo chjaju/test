@@ -205,35 +205,11 @@ atio.expire_snapshots("my_table", keep_for=timedelta(days=7), dry_run=False)
 
 **Atio Solution**: Using `atio.expire_snapshots()` allows automatic cleanup of snapshots and orphaned files older than the set retention period. You can preview files to be deleted with `dry_run=True` option, then safely perform cleanup operations.
 
-### Scenario 6: Network Error During Database Storage
-
-**Problem**: While saving analysis results to a PostgreSQL database, the network connection was interrupted, stopping the save operation. Partially saved tables remained in the database, breaking data integrity.
-
-**Atio Solution**: `atio.write()`'s database storage feature uses transactions to ensure all data is either successfully saved or not saved at all. When network errors occur, automatic rollback maintains data integrity.
-
-### Scenario 7: Complexity in Experimental Data Management
+### Scenario 6: Complexity in Experimental Data Management
 
 **Problem**: A research team was conducting multiple experiments simultaneously, causing experimental data to mix and making it difficult to track which data was used for which experiment. Experimental result reliability decreased and reproduction became impossible.
 
 **Atio Solution**: Using `atio.write_snapshot()` creates independent tables for each experiment, and `atio.read_table()` can read the exact data for specific experiments. Automated version management and metadata tracking for each experiment ensures research reproducibility and reliability.
-
-### Scenario 8: Data Loss During Cloud Streaming
-
-**Problem**: While processing real-time data collected from IoT sensors, system restart or network errors occurred. Data being processed was lost, breaking the continuity of important sensor data.
-
-**Atio Solution**: Using `atio.write_snapshot()` buffers real-time data and saves it atomically at regular intervals. After system restart, data collection can resume from the last save point, ensuring data continuity.
-
-### Scenario 9: Memory Shortage During Large Data Processing
-
-**Problem**: While processing DataFrames larger than 10GB, the process was force-terminated due to memory shortage. All intermediate results being processed were lost, requiring restart from the beginning.
-
-**Atio Solution**: Using `atio.write()`'s `show_progress=True` option along with chunk-based data processing controls memory usage. Each chunk is processed after the previous one is successfully saved, so even if it fails in the middle, already saved data is preserved.
-
-### Scenario 10: Conflicts with Backup Systems
-
-**Problem**: While trying to save a large file during automatic backup system execution, the backup software attempted to backup a file being written, causing file corruption. The backup file was also saved in an incomplete state.
-
-**Atio Solution**: Using `atio.write()`'s atomic replacement method for file saving ensures that backup systems only see complete files when reading. Temporary files are excluded from backup targets, enabling conflict-free, safe backups.
 
 ## 🛡️ Safety Guarantees
 
