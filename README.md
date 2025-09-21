@@ -30,11 +30,8 @@
 - [🔧 Advanced Usage](#-advanced-usage)
 - [🛠️ Installation](#️-installation)
 - [📚 Documentation & Examples](#-documentation--examples)
-- [🤝 Contributing](#-contributing)
 - [🏆 Why Choose Atio?](#-why-choose-atio)
-- [📈 Roadmap](#-roadmap)
 - [📄 License](#-license)
-- [🙏 Acknowledgments](#-acknowledgments)
 
 ---
 
@@ -276,36 +273,6 @@ pip install -e .
 - **[Out of Memory](tests/scenarios/2_oom/)** - Memory failure handling
 - **[CI/CD Pipeline](tests/scenarios/3_ci_failure/)** - Automated deployment safety
 
-## 🤝 Contributing
-
-We welcome contributions! Here's how you can help:
-
-### 🐛 Bug Reports
-- **[Report Issues](https://github.com/seojaeohcode/atio/issues)** - Found a bug?
-- **[Feature Requests](https://github.com/seojaeohcode/atio/discussions)** - Have an idea?
-
-### 💻 Development
-```bash
-# Fork the repository
-git clone https://github.com/your-username/atio.git
-cd atio
-
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run benchmarks
-python benchmark_write_speed.py
-```
-
-### 📋 Code Style
-- Follow [PEP 8](https://pep8.org/) guidelines
-- Use type hints where appropriate
-- Add tests for new features
-- Update documentation
-
 ## 🏆 Why Choose Atio?
 
 ### ✅ **Data Safety First**
@@ -328,28 +295,9 @@ python benchmark_write_speed.py
 - **Multiple libraries** (Pandas, Polars, NumPy)
 - **Database integration** (SQL, NoSQL)
 
-## 📈 Roadmap
-
-### 🎯 **v2.2.0** (Coming Soon)
-- [ ] Enhanced error diagnostics
-- [ ] Async/await support
-- [ ] Cloud storage integration (S3, GCS, Azure)
-
-### 🚀 **v3.0.0** (Future)
-- [ ] Distributed atomic operations
-- [ ] Real-time collaboration features
-- [ ] Advanced compression algorithms
-
 ## 📄 License
 
 This project is distributed under the **Apache 2.0 License**. See the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Pandas Team** - For the amazing data manipulation library
-- **Polars Team** - For the high-performance DataFrame library
-- **NumPy Team** - For the fundamental array computing library
-- **Community Contributors** - For feedback, bug reports, and feature suggestions
 
 ---
 
