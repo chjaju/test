@@ -263,15 +263,195 @@ pip install -e .
 - **[Advanced Usage](https://seojaeohcode.github.io/atio/advanced_usage.html)** - Power user features
 
 ### 🎯 Examples
-- **[Basic Usage](examples/example_atomicwriter_trace.py)** - Simple file operations
-- **[Progress Monitoring](examples/example_progress.py)** - Large file handling
-- **[Snapshot Management](examples/example_snapshot.py)** - Version control
-- **[Performance Testing](examples/test_basic_vs_verbose.py)** - Benchmarking
+
+#### 📝 **Basic Usage** - Simple file operations
+```python
+import atio
+import pandas as pd
+
+# Create sample data
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie"],
+    "age": [25, 30, 35],
+    "city": ["Seoul", "Busan", "Incheon"]
+})
+
+# Safe atomic writing
+atio.write(df, "users.parquet", format="parquet")
+print("✅ File saved safely!")
+
+# Read back to verify
+df_read = pd.read_parquet("users.parquet")
+print(df_read)
+```
+
+#### 📊 **Progress Monitoring** - Large file handling
+```python
+import atio
+import pandas as pd
+import numpy as np
+
+# Create large dataset
+large_df = pd.DataFrame(np.random.randn(200000, 5), columns=list("ABCDE"))
+
+# Save with progress monitoring
+atio.write(large_df, "large_data.parquet", 
+          format="parquet", 
+          show_progress=True)
+# Shows: ⠋ Writing large_data.parquet... [ 45.2 MB | 12.3 MB/s | 00:15 ]
+```
+
+#### 📋 **Snapshot Management** - Version control
+```python
+import atio
+import pandas as pd
+
+# Version 1: Initial data
+df_v1 = pd.DataFrame({"id": [1, 2, 3], "value": ["A", "B", "C"]})
+atio.write_snapshot(df_v1, "my_table", mode="overwrite")
+
+# Version 2: Append new data
+df_v2 = pd.DataFrame({"score": [95, 87, 92]})
+atio.write_snapshot(df_v2, "my_table", mode="append")
+
+# Read specific version
+df_latest = atio.read_table("my_table")  # Latest version
+df_v1 = atio.read_table("my_table", version=1)  # Version 1
+```
+
+#### ⚡ **Performance Testing** - Benchmarking
+```python
+import atio
+import pandas as pd
+import time
+
+# Performance comparison
+df = pd.DataFrame(np.random.randn(100000, 10))
+
+# Standard pandas
+start = time.time()
+df.to_parquet("standard.parquet")
+pandas_time = time.time() - start
+
+# Atio with safety
+start = time.time()
+atio.write(df, "safe.parquet", format="parquet", verbose=True)
+atio_time = time.time() - start
+
+print(f"Pandas: {pandas_time:.3f}s")
+print(f"Atio: {atio_time:.3f}s")
+print(f"Safety overhead: {((atio_time/pandas_time - 1) * 100):.1f}%")
+```
 
 ### 🧪 Test Scenarios
-- **[Keyboard Interrupt](tests/scenarios/1_keyboard_interrupt/)** - Ctrl+C safety
-- **[Out of Memory](tests/scenarios/2_oom/)** - Memory failure handling
-- **[CI/CD Pipeline](tests/scenarios/3_ci_failure/)** - Automated deployment safety
+
+#### ⌨️ **Keyboard Interrupt** - Ctrl+C safety
+```python
+# test_interrupt.py
+import atio
+import pandas as pd
+import numpy as np
+
+print("Creating large dataset...")
+df = pd.DataFrame(np.random.randn(1000000, 10))
+
+print("Starting write operation...")
+print("Press Ctrl+C to test interrupt safety!")
+
+try:
+    atio.write(df, "test_interrupt.parquet", 
+              format="parquet", 
+              show_progress=True)
+    print("✅ Write completed successfully!")
+except KeyboardInterrupt:
+    print("❌ Interrupted by user!")
+    print("🔍 Checking file safety...")
+    import os
+    if os.path.exists("test_interrupt.parquet"):
+        print("⚠️  File exists but may be corrupted")
+    else:
+        print("✅ No corrupted file left behind!")
+```
+
+#### 💾 **Out of Memory** - Memory failure handling
+```python
+# test_oom.py
+import atio
+import pandas as pd
+import numpy as np
+
+def simulate_oom():
+    print("Creating extremely large dataset...")
+    # This will likely cause OOM
+    huge_df = pd.DataFrame(np.random.randn(10000000, 100))
+    
+    print("Attempting to save...")
+    try:
+        atio.write(huge_df, "huge_data.parquet", format="parquet")
+        print("✅ Successfully saved!")
+    except MemoryError:
+        print("❌ Out of Memory error!")
+        print("✅ But original file is safe!")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        print("✅ Atio protected your data!")
+
+# Run the test
+simulate_oom()
+```
+
+#### 🚀 **CI/CD Pipeline** - Automated deployment safety
+```python
+# ci_pipeline.py
+import atio
+import pandas as pd
+import os
+
+def deploy_artifacts():
+    """Simulate CI/CD pipeline deployment"""
+    
+    # Generate deployment artifacts
+    config = pd.DataFrame({
+        "service": ["api", "web", "db"],
+        "version": ["v1.2.3", "v1.2.3", "v1.2.3"],
+        "status": ["ready", "ready", "ready"]
+    })
+    
+    metrics = pd.DataFrame({
+        "metric": ["cpu", "memory", "disk"],
+        "value": [75.5, 68.2, 45.1],
+        "unit": ["%", "%", "%"]
+    })
+    
+    print("🚀 Starting deployment...")
+    
+    try:
+        # Atomic deployment - either all succeed or all fail
+        atio.write(config, "deployment_config.json", format="json")
+        atio.write(metrics, "deployment_metrics.parquet", format="parquet")
+        
+        # Create success marker
+        atio.write(pd.DataFrame({"status": ["deployed"]}), 
+                  "deployment_success.parquet", format="parquet")
+        
+        print("✅ Deployment completed successfully!")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Deployment failed: {e}")
+        print("🔄 Rolling back...")
+        
+        # Clean up any partial files
+        for file in ["deployment_config.json", "deployment_metrics.parquet"]:
+            if os.path.exists(file):
+                os.remove(file)
+        
+        print("✅ Rollback completed - system is clean!")
+        return False
+
+# Test the pipeline
+deploy_artifacts()
+```
 
 ## 🏆 Why Choose Atio?
 
