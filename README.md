@@ -111,17 +111,6 @@ graph LR
 - **📋 Version Management**: Snapshot-based data versioning
 - **🧹 Auto Cleanup**: Automatic cleanup of temporary files
 
-## ⚡ Performance Comparison
-
-| Method | 100K Rows | 1M Rows | Safety | Version Control | Memory Usage |
-|--------|-----------|---------|--------|----------------|--------------|
-| **Atio write()** | 0.58s | 6.01s | ✅ | ❌ | Low |
-| **Atio Snapshot** | 1.16s | 12.68s | ✅ | ✅ | Medium |
-| Pandas | 0.57s | 5.71s | ❌ | ❌ | Low |
-| Polars | 0.01s | 0.12s | ❌ | ❌ | Very Low |
-
-*Benchmark results on SSD storage with random data*
-
 ## 💡 Real-World Use Cases
 
 ### 🔥 Data Pipeline Protection
